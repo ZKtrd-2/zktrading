@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>منصة الاستثمار</title>
+  <link rel="stylesheet" href="styles.css">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore.js"></script>
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div id="login-section">
+    <h2>تسجيل الدخول</h2>
+    <input type="email" id="login-email" placeholder="البريد الإلكتروني">
+    <input type="password" id="login-password" placeholder="كلمة المرور">
+    <button id="login-btn">دخول</button>
+    <p><a href="#" id="forgot-password">نسيت كلمة المرور؟</a></p>
+    <p id="message"></p>
+  </div>
+
+  <div id="dashboard" style="display: none;">
+    <h2>مرحبًا بك في لوحة التحكم</h2>
+    <p>البريد الإلكتروني: <span id="user-email"></span></p>
+    <div id="financial-assets">
+      <h3>أصولك المالية</h3>
+      <ul id="assets-list"></ul>
+      <p><strong>القيمة الإجمالية للمحفظة: </strong><span id="total-value">0</span> $</p>
+      <input type="text" id="new-asset" placeholder="إضافة أصل جديد">
+      <input type="number" id="new-asset-value" placeholder="قيمة الأصل ($)">
+      <button id="add-asset-btn">إضافة الأصل</button>
+    </div>
+    <button id="logout-btn">تسجيل الخروج</button>
+  </div>
+
+  <div id="logout-page" style="display: none;">
+    <h2>تم تسجيل الخروج بنجاح</h2>
+    <p>شكراً لاستخدامك منصتنا! نتمنى لك يومًا سعيدًا.</p>
+    <button id="back-to-login-btn">العودة إلى تسجيل الدخول</button>
+  </div>
+</body>
+</html>

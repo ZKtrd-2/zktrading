@@ -1,0 +1,91 @@
+// إعدادات Firebase
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+// تهيئة Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.getAuth(app);
+const db = firebase.getFirestore(app);
+
+// تسجيل الدخول
+document.getElementById('login-btn').addEventListener('click', async () => {
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  const message = document.getElementById('message');
+
+  try {
+    const userCredential = await firebase.signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    // إظهار لوحة التحكم
+    document.getElementById('login-section').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    document.getElementById('user-email').textContent = user.email;
+
+    // تحميل الأصول
+    loadAssets(user.uid);
+  } catch (error) {
+    message.textContent = `خطأ: ${error.message}`;
+  }
+});
+
+// تسجيل الخروج
+document.getElementById('logout-btn').addEventListener('click', () => {
+  firebase.signOut(auth).then(() => {
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('logout-page').style.display = 'block';
+  });
+});
+
+// العودة إلى تسجيل الدخول
+document.getElementById('back-to-login-btn').addEventListener('click', () => {
+  document.getElementById('logout-page').style.display = 'none';
+  document.getElementById('login-section').style.display = 'block';
+});
+
+// تحميل الأصول المالية
+async function loadAssets(userId) {
+  const assetsList = document.getElementById('assets-list');
+  const totalValueSpan = document.getElementById('total-value');
+  assetsList.innerHTML = '';
+  let totalValue = 0;
+
+  const assetsQuery = firebase.collection(db, `users/${userId}/assets`);
+  const snapshot = await firebase.getDocs(assetsQuery);
+
+  snapshot.forEach((doc) => {
+    const asset = doc.data();
+    totalValue += asset.value;
+
+    const li = document.createElement('li');
+    li.textContent = `${asset.name}: $${asset.value}`;
+    assetsList.appendChild(li);
+  });
+
+  totalValueSpan.textContent = totalValue.toFixed(2);
+}
+
+// إضافة أصل جديد
+document.getElementById('add-asset-btn').addEventListener('click', async () => {
+  const newAsset = document.getElementById('new-asset').value;
+  const newAssetValue = parseFloat(document.getElementById('new-asset-value').value);
+  const user = firebase.currentUser(auth);
+
+  if (!newAsset || isNaN(newAssetValue)) return;
+
+  try {
+    const assetRef = firebase.collection(db, `users/${user.uid}/assets`);
+    await firebase.addDoc(assetRef, { name: newAsset, value: newAssetValue });
+    loadAssets(user.uid);
+    document.getElementById('new-asset').value = '';
+    document.getElementById('new-asset-value').value = '';
+  } catch (error) {
+    console.error('خطأ أثناء إضافة الأصل:', error);
+  }
+});
